@@ -5,7 +5,7 @@
 const WEDDING = {
   date: "2027-02-14T19:00:00+05:30",
   whatsappNumber: "919876543210",
-  couple: "Harsh & Kavita"
+  couple: "Yash & Kavita"
 };
 
 
@@ -121,7 +121,6 @@ const musicPlayer = musicShell?.parentElement?.classList.contains("music-player"
   ? musicShell.parentElement
   : musicShell;
 
-// Flatten the old nested player markup so the extra wrapper cannot cover the button.
 if (musicButton && musicShell && musicPlayer && musicShell !== musicPlayer) {
   musicPlayer.insertBefore(musicButton, musicShell);
   musicShell.remove();
@@ -220,7 +219,6 @@ audio?.addEventListener("error", () => {
   let lastCheck = 0;
   let invitationEntered = false;
 
-  // Scratching is optional. The same Enter button always opens the invitation.
   enterButton.disabled = false;
 
   function paintCover() {
@@ -292,8 +290,6 @@ audio?.addEventListener("error", () => {
     if (invitationEntered) return;
     invitationEntered = true;
 
-    // Start playback directly from the Enter button's user gesture.
-    // If playback is blocked or unavailable, the on-screen music control can retry.
     playWeddingMusic();
 
     gate.classList.add("is-hidden");
