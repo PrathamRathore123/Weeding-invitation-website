@@ -124,21 +124,19 @@ if (petalLayer) {
 const audio = document.getElementById("weddingAudio");
 const musicButton = document.getElementById("musicToggle");
 const musicLabel = document.getElementById("musicLabel");
-
-let invitationOpened = false;
+const musicPlayer = musicButton?.closest(".music-player");
 
 function updateMusicButton(playing) {
   if (!musicButton) return;
 
   musicButton.parentElement?.classList.toggle("playing", playing);
+  musicButton.textContent = playing ? "♫" : "♪";
+  musicButton.setAttribute("aria-label", playing ? "Pause wedding song" : "Play wedding song");
+  musicButton.setAttribute("aria-pressed", String(playing));
 
   if (musicLabel) {
-    musicLabel.textContent = playing
-      ? "NOW PLAYING"
-      : "PLAY OUR SONG";
+    musicLabel.textContent = playing ? "NOW PLAYING · PAUSE" : "PLAY OUR SONG";
   }
-
-  musicButton.textContent = playing ? "♫" : "♪";
 }
 
 async function playWeddingMusic() {
@@ -152,34 +150,40 @@ async function playWeddingMusic() {
     updateMusicButton(true);
   } catch (error) {
     console.warn("Unable to play wedding music:", error);
-
-    if (musicLabel) {
-      musicLabel.textContent = "TAP TO PLAY";
-    }
+    if (musicLabel) musicLabel.textContent = "TAP TO TRY AGAIN";
   }
 }
 
 function pauseWeddingMusic() {
   if (!audio) return;
-
   audio.pause();
   updateMusicButton(false);
 }
 
-// Floating button: play / pause
-musicButton?.addEventListener("click", async () => {
-  if (!audio) return;
+musicButton?.addEventListener("click", () => {
+  if (!audio) {
+    if (musicLabel) musicLabel.textContent = "SONG NOT FOUND";
+    return;
+  }
 
   if (audio.paused) {
-    await playWeddingMusic();
+    playWeddingMusic();
   } else {
     pauseWeddingMusic();
   }
 });
 
-// Keep button in sync if audio is paused or played elsewhere
 audio?.addEventListener("play", () => updateMusicButton(true));
 audio?.addEventListener("pause", () => updateMusicButton(false));
+audio?.addEventListener("error", () => {
+  if (musicLabel) musicLabel.textContent = "SONG UNAVAILABLE";
+});
+
+// Repair visibility of the existing player wrapper. It was hidden inline in the
+// original markup; it becomes available only after the invitation is opened.
+if (musicPlayer) {
+  musicPlayer.style.display = "none";
+}
 
 
 // ========================================
@@ -194,9 +198,8 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
 
   if (!gate || !canvas || !enterButton) return;
 
-  const ctx = canvas.getContext("2d", {
-    willReadFrequently: true
-  });
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) return;
 
   document.body.classList.add("scratch-locked");
 
@@ -207,21 +210,24 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
 
   enterButton.disabled = true;
 
+  // Allow guests to skip the scratch interaction entirely.
+  const skipButton = document.createElement("button");
+  skipButton.id = "skipScratch";
+  skipButton.type = "button";
+  skipButton.textContent = "Skip scratch & open invitation";
+  skipButton.style.cssText = "display:block;margin:12px auto 0;padding:10px 16px;border:1px solid #c89b45;border-radius:4px;background:transparent;color:#742723;font:inherit;font-size:14px;cursor:pointer;";
+  enterButton.insertAdjacentElement("afterend", skipButton);
+
   function paintCover() {
     const rect = canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
 
     const dpr = Math.max(1, window.devicePixelRatio || 1);
-
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
-
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const gradient = ctx.createLinearGradient(
-      0, 0, rect.width, rect.height
-    );
-
+    const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
     gradient.addColorStop(0, "#d9b56d");
     gradient.addColorStop(0.5, "#f1d99e");
     gradient.addColorStop(1, "#bd914b");
@@ -234,29 +240,42 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
     ctx.textAlign = "center";
     ctx.font = "600 15px sans-serif";
     ctx.fillText("✦ SCRATCH HERE ✦", rect.width / 2, rect.height / 2);
-
     ctx.font = "12px sans-serif";
-    ctx.fillText(
-      "Use your finger or mouse",
-      rect.width / 2,
-      rect.height / 2 + 24
-    );
+    ctx.fillText("Use your finger or mouse", rect.width / 2, rect.height / 2 + 24);
   }
 
   function getPoint(event) {
     const rect = canvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
 
-    return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
-    };
+  function checkProgress() {
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let clear = 0;
+    let total = 0;
+
+    for (let i = 3; i < pixels.length; i += 32) {
+      total++;
+      if (pixels[i] < 80) clear++;
+    }
+
+    const percentage = total ? Math.round((clear / total) * 100) : 0;
+
+    if (percentage >= 45) {
+      revealed = true;
+      canvas.style.transition = "opacity .5s";
+      canvas.style.opacity = "0";
+      enterButton.disabled = false;
+      if (progress) progress.textContent = "The surprise is revealed! 💛";
+    } else if (progress) {
+      progress.textContent = "Keep scratching to reveal the surprise ✨";
+    }
   }
 
   function scratch(event) {
     if (!drawing || revealed) return;
 
     const point = getPoint(event);
-
     ctx.globalCompositeOperation = "destination-out";
     ctx.beginPath();
     ctx.arc(point.x, point.y, 22, 0, Math.PI * 2);
@@ -268,43 +287,24 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
     }
   }
 
-  function checkProgress() {
-    const pixels = ctx.getImageData(
-      0, 0, canvas.width, canvas.height
-    ).data;
+  function openInvitation() {
+    if (invitationEntered) return;
+    invitationEntered = true;
 
-    let clear = 0;
-    let total = 0;
+    // Do not autoplay: guests can start and stop the song with the player button.
+    gate.classList.add("is-hidden");
+    document.body.classList.remove("scratch-locked");
 
-    for (let i = 3; i < pixels.length; i += 32) {
-      total++;
-
-      if (pixels[i] < 80) clear++;
+    if (musicPlayer) {
+      musicPlayer.style.removeProperty("display");
+      musicPlayer.style.display = "flex";
     }
 
-    const percentage = total
-      ? Math.round((clear / total) * 100)
-      : 0;
-
-    if (percentage >= 45) {
-      revealed = true;
-
-      canvas.style.transition = "opacity .5s";
-      canvas.style.opacity = "0";
-
-      enterButton.disabled = false;
-
-      if (progress) {
-        progress.textContent = "The surprise is revealed! 💛";
-      }
-    } else if (progress) {
-      progress.textContent = "Keep scratching to reveal the surprise ✨";
-    }
+    setTimeout(() => gate.remove(), 700);
   }
 
   canvas.addEventListener("pointerdown", event => {
     if (revealed) return;
-
     drawing = true;
     canvas.setPointerCapture(event.pointerId);
     scratch(event);
@@ -313,36 +313,15 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
   canvas.addEventListener("pointermove", scratch);
 
   ["pointerup", "pointercancel", "lostpointercapture"].forEach(type => {
-    canvas.addEventListener(type, () => {
-      drawing = false;
-    });
+    canvas.addEventListener(type, () => { drawing = false; });
   });
 
-  // IMPORTANT:
-  // This button opens the invitation AND starts the song.
   enterButton.addEventListener("click", () => {
-    if (!revealed || invitationEntered) return;
-
-    invitationEntered = true;
-
-    // Start audio directly inside the user's click interaction.
-    // This is important for mobile browser autoplay permission.
-    playWeddingMusic();
-
-    // Reveal the main wedding website.
-    gate.classList.add("is-hidden");
-    document.body.classList.remove("scratch-locked");
-
-    // Show the floating music button.
-    if (musicButton) {
-      musicButton.style.display = "flex";
-    }
-
-    setTimeout(() => gate.remove(), 700);
+    if (revealed) openInvitation();
   });
+  skipButton.addEventListener("click", openInvitation);
 
   paintCover();
-
   window.addEventListener("resize", () => {
     if (!revealed) paintCover();
   });
@@ -361,14 +340,8 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
 
   if (!track || !dotsContainer) return;
 
-  const slides = Array.from(
-    document.querySelectorAll(".slide")
-  );
-
-  const dots = Array.from(
-    dotsContainer.querySelectorAll(".dot")
-  );
-
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const dots = Array.from(dotsContainer.querySelectorAll(".dot"));
   if (!slides.length) return;
 
   let currentSlide = 0;
@@ -376,13 +349,8 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
 
   function showSlide(index) {
     currentSlide = (index + slides.length) % slides.length;
-
-    track.style.transform =
-      `translateX(-${currentSlide * 100}%)`;
-
-    dots.forEach((dot, i) => {
-      dot.classList.toggle("active", i === currentSlide);
-    });
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    dots.forEach((dot, i) => dot.classList.toggle("active", i === currentSlide));
   }
 
   function changeSlide(direction) {
@@ -391,10 +359,7 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
 
   function startAutoSlide() {
     clearInterval(autoSlide);
-
-    autoSlide = setInterval(() => {
-      changeSlide(1);
-    }, 4000);
+    autoSlide = setInterval(() => changeSlide(1), 4000);
   }
 
   previousButton?.addEventListener("click", () => {
@@ -414,17 +379,13 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
     });
   });
 
-  // Mobile swipe support
   let touchStartX = 0;
-
   track.addEventListener("touchstart", event => {
     touchStartX = event.changedTouches[0].clientX;
   }, { passive: true });
 
   track.addEventListener("touchend", event => {
-    const touchEndX = event.changedTouches[0].clientX;
-    const difference = touchStartX - touchEndX;
-
+    const difference = touchStartX - event.changedTouches[0].clientX;
     if (Math.abs(difference) > 45) {
       changeSlide(difference > 0 ? 1 : -1);
       startAutoSlide();
@@ -459,17 +420,12 @@ rsvpForm?.addEventListener("submit", event => {
 
   if (!number || number === "919876543210") {
     const note = document.getElementById("rsvpNote");
-
     if (note) {
-      note.textContent =
-        "Demo mode: update whatsappNumber in script.js to receive RSVPs.";
+      note.textContent = "Demo mode: update whatsappNumber in script.js to receive RSVPs.";
     }
-
     return;
   }
 
-  const url =
-    `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-
+  const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank", "noopener");
 });
