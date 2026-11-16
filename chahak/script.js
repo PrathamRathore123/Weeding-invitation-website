@@ -1,4 +1,3 @@
-
 // ========================================
 // EDIT YOUR WEDDING DETAILS HERE
 // ========================================
@@ -15,7 +14,6 @@ const WEDDING = {
 // ========================================
 
 function updateCountdown() {
-
   const target = new Date(WEDDING.date).getTime();
   const now = Date.now();
 
@@ -32,17 +30,15 @@ function updateCountdown() {
 
   const seconds = Math.floor(diff / 1000);
 
-  document.getElementById("days").textContent =
-    String(days).padStart(3, "0");
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
 
-  document.getElementById("hours").textContent =
-    String(hours).padStart(2, "0");
-
-  document.getElementById("minutes").textContent =
-    String(minutes).padStart(2, "0");
-
-  document.getElementById("seconds").textContent =
-    String(seconds).padStart(2, "0");
+  setText("days", String(days).padStart(3, "0"));
+  setText("hours", String(hours).padStart(2, "0"));
+  setText("minutes", String(minutes).padStart(2, "0"));
+  setText("seconds", String(seconds).padStart(2, "0"));
 }
 
 updateCountdown();
@@ -54,11 +50,9 @@ setInterval(updateCountdown, 1000);
 // ========================================
 
 window.addEventListener("load", () => {
-
   setTimeout(() => {
-    document.getElementById("loader").classList.add("hide");
+    document.getElementById("loader")?.classList.add("hide");
   }, 650);
-
 });
 
 
@@ -69,16 +63,14 @@ window.addEventListener("load", () => {
 const menuToggle = document.getElementById("menuToggle");
 const nav = document.getElementById("nav");
 
-menuToggle.addEventListener("click", () => {
-  nav.classList.toggle("open");
+menuToggle?.addEventListener("click", () => {
+  nav?.classList.toggle("open");
 });
 
-nav.querySelectorAll("a").forEach(link => {
-
+nav?.querySelectorAll("a").forEach(link => {
   link.addEventListener("click", () => {
     nav.classList.remove("open");
   });
-
 });
 
 
@@ -86,27 +78,21 @@ nav.querySelectorAll("a").forEach(link => {
 // SCROLL REVEAL
 // ========================================
 
-const observer = new IntersectionObserver(entries => {
+if ("IntersectionObserver" in window) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
 
-  entries.forEach(entry => {
-
-    if (entry.isIntersecting) {
-
-      entry.target.classList.add("visible");
-      observer.unobserve(entry.target);
-
-    }
-
+  document.querySelectorAll(".reveal, .event-card").forEach(element => {
+    element.classList.add("reveal");
+    observer.observe(element);
   });
-
-}, { threshold: 0.12 });
-
-document.querySelectorAll(".reveal, .event-card").forEach(element => {
-
-  element.classList.add("reveal");
-  observer.observe(element);
-
-});
+}
 
 
 // ========================================
@@ -115,41 +101,98 @@ document.querySelectorAll(".reveal, .event-card").forEach(element => {
 
 const petalLayer = document.getElementById("petals");
 
-for (let i = 0; i < 18; i++) {
+if (petalLayer) {
+  for (let i = 0; i < 18; i++) {
+    const petal = document.createElement("span");
 
-  const petal = document.createElement("span");
+    petal.className = "petal";
+    petal.style.left = Math.random() * 100 + "%";
+    petal.style.animationDuration = (10 + Math.random() * 13) + "s";
+    petal.style.animationDelay = (-Math.random() * 20) + "s";
+    petal.style.opacity = (0.18 + Math.random() * 0.35).toFixed(2);
+    petal.style.transform = `scale(${0.55 + Math.random() * 0.8})`;
 
-  petal.className = "petal";
-
-  petal.style.left = Math.random() * 100 + "%";
-
-  petal.style.animationDuration =
-    (10 + Math.random() * 13) + "s";
-
-  petal.style.animationDelay =
-    (-Math.random() * 20) + "s";
-
-  petal.style.opacity =
-    (0.18 + Math.random() * 0.35).toFixed(2);
-
-  petal.style.transform =
-    `scale(${0.55 + Math.random() * 0.8})`;
-
-  petalLayer.appendChild(petal);
-
+    petalLayer.appendChild(petal);
+  }
 }
 
 
 // ========================================
-// SCRATCH CARD REVEAL
+// WEDDING SONG PLAYER
+// ========================================
+
+const audio = document.getElementById("weddingAudio");
+const musicButton = document.getElementById("musicToggle");
+const musicLabel = document.getElementById("musicLabel");
+
+let invitationOpened = false;
+
+function updateMusicButton(playing) {
+  if (!musicButton) return;
+
+  musicButton.parentElement?.classList.toggle("playing", playing);
+
+  if (musicLabel) {
+    musicLabel.textContent = playing
+      ? "NOW PLAYING"
+      : "PLAY OUR SONG";
+  }
+
+  musicButton.textContent = playing ? "♫" : "♪";
+}
+
+async function playWeddingMusic() {
+  if (!audio) {
+    if (musicLabel) musicLabel.textContent = "SONG NOT FOUND";
+    return;
+  }
+
+  try {
+    await audio.play();
+    updateMusicButton(true);
+  } catch (error) {
+    console.warn("Unable to play wedding music:", error);
+
+    if (musicLabel) {
+      musicLabel.textContent = "TAP TO PLAY";
+    }
+  }
+}
+
+function pauseWeddingMusic() {
+  if (!audio) return;
+
+  audio.pause();
+  updateMusicButton(false);
+}
+
+// Floating button: play / pause
+musicButton?.addEventListener("click", async () => {
+  if (!audio) return;
+
+  if (audio.paused) {
+    await playWeddingMusic();
+  } else {
+    pauseWeddingMusic();
+  }
+});
+
+// Keep button in sync if audio is paused or played elsewhere
+audio?.addEventListener("play", () => updateMusicButton(true));
+audio?.addEventListener("pause", () => updateMusicButton(false));
+
+
+// ========================================
+// SCRATCH CARD REVEAL + ENTER INVITATION
 // ========================================
 
 (() => {
-
   const gate = document.getElementById("scratchGate");
   const canvas = document.getElementById("scratchCanvas");
   const enterButton = document.getElementById("enterInvite");
   const progress = document.getElementById("scratchProgress");
+
+  if (!gate || !canvas || !enterButton) return;
 
   const ctx = canvas.getContext("2d", {
     willReadFrequently: true
@@ -160,11 +203,13 @@ for (let i = 0; i < 18; i++) {
   let drawing = false;
   let revealed = false;
   let lastCheck = 0;
+  let invitationEntered = false;
 
+  enterButton.disabled = true;
 
   function paintCover() {
-
     const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
 
     const dpr = Math.max(1, window.devicePixelRatio || 1);
 
@@ -182,101 +227,66 @@ for (let i = 0; i < 18; i++) {
     gradient.addColorStop(1, "#bd914b");
 
     ctx.globalCompositeOperation = "source-over";
-
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, rect.width, rect.height);
 
     ctx.fillStyle = "rgba(255,255,255,.4)";
     ctx.textAlign = "center";
     ctx.font = "600 15px sans-serif";
-
-    ctx.fillText(
-      "✦ SCRATCH HERE ✦",
-      rect.width / 2,
-      rect.height / 2
-    );
+    ctx.fillText("✦ SCRATCH HERE ✦", rect.width / 2, rect.height / 2);
 
     ctx.font = "12px sans-serif";
-
     ctx.fillText(
       "Use your finger or mouse",
       rect.width / 2,
       rect.height / 2 + 24
     );
-
   }
 
-
   function getPoint(event) {
-
     const rect = canvas.getBoundingClientRect();
 
     return {
       x: event.clientX - rect.left,
       y: event.clientY - rect.top
     };
-
   }
 
-
   function scratch(event) {
-
     if (!drawing || revealed) return;
 
     const point = getPoint(event);
 
     ctx.globalCompositeOperation = "destination-out";
-
     ctx.beginPath();
-
-    ctx.arc(
-      point.x,
-      point.y,
-      22,
-      0,
-      Math.PI * 2
-    );
-
+    ctx.arc(point.x, point.y, 22, 0, Math.PI * 2);
     ctx.fill();
 
     if (Date.now() - lastCheck > 350) {
-
       lastCheck = Date.now();
       checkProgress();
-
     }
-
   }
 
-
   function checkProgress() {
-
     const pixels = ctx.getImageData(
-      0,
-      0,
-      canvas.width,
-      canvas.height
+      0, 0, canvas.width, canvas.height
     ).data;
 
     let clear = 0;
     let total = 0;
 
     for (let i = 3; i < pixels.length; i += 32) {
-
       total++;
 
-      if (pixels[i] < 80) {
-        clear++;
-      }
-
+      if (pixels[i] < 80) clear++;
     }
 
-    const percentage = Math.round(
-      (clear / total) * 100
-    );
+    const percentage = total
+      ? Math.round((clear / total) * 100)
+      : 0;
 
     if (percentage >= 45) {
-
       revealed = true;
 
       canvas.style.transition = "opacity .5s";
@@ -284,68 +294,58 @@ for (let i = 0; i < 18; i++) {
 
       enterButton.disabled = false;
 
-      progress.textContent =
-        "The surprise is revealed! 💛";
-
-    } else {
-
-      progress.textContent =
-        "Keep scratching to reveal the surprise ✨";
-
+      if (progress) {
+        progress.textContent = "The surprise is revealed! 💛";
+      }
+    } else if (progress) {
+      progress.textContent = "Keep scratching to reveal the surprise ✨";
     }
-
   }
 
-
   canvas.addEventListener("pointerdown", event => {
-
     if (revealed) return;
 
     drawing = true;
-
     canvas.setPointerCapture(event.pointerId);
-
     scratch(event);
-
   });
-
 
   canvas.addEventListener("pointermove", scratch);
 
-
   ["pointerup", "pointercancel", "lostpointercapture"].forEach(type => {
-
     canvas.addEventListener(type, () => {
       drawing = false;
     });
-
   });
 
-
+  // IMPORTANT:
+  // This button opens the invitation AND starts the song.
   enterButton.addEventListener("click", () => {
+    if (!revealed || invitationEntered) return;
 
-    if (!revealed) return;
+    invitationEntered = true;
 
+    // Start audio directly inside the user's click interaction.
+    // This is important for mobile browser autoplay permission.
+    playWeddingMusic();
+
+    // Reveal the main wedding website.
     gate.classList.add("is-hidden");
-
     document.body.classList.remove("scratch-locked");
 
+    // Show the floating music button.
+    if (musicButton) {
+      musicButton.style.display = "flex";
+    }
+
     setTimeout(() => gate.remove(), 700);
-
   });
-
 
   paintCover();
 
-
   window.addEventListener("resize", () => {
-
-    if (!revealed) {
-      paintCover();
-    }
-
+    if (!revealed) paintCover();
   });
-
 })();
 
 
@@ -354,17 +354,12 @@ for (let i = 0; i < 18; i++) {
 // ========================================
 
 (() => {
-
   const track = document.getElementById("slides");
+  const dotsContainer = document.getElementById("sliderDots");
+  const previousButton = document.getElementById("prevSlide");
+  const nextButton = document.getElementById("nextSlide");
 
-  const dotsContainer =
-    document.getElementById("sliderDots");
-
-  const previousButton =
-    document.getElementById("prevSlide");
-
-  const nextButton =
-    document.getElementById("nextSlide");
+  if (!track || !dotsContainer) return;
 
   const slides = Array.from(
     document.querySelectorAll(".slide")
@@ -374,173 +369,85 @@ for (let i = 0; i < 18; i++) {
     dotsContainer.querySelectorAll(".dot")
   );
 
-  let currentSlide = 0;
+  if (!slides.length) return;
 
+  let currentSlide = 0;
   let autoSlide;
 
-
   function showSlide(index) {
-
-    currentSlide =
-      (index + slides.length) % slides.length;
+    currentSlide = (index + slides.length) % slides.length;
 
     track.style.transform =
       `translateX(-${currentSlide * 100}%)`;
 
     dots.forEach((dot, i) => {
-
-      dot.classList.toggle(
-        "active",
-        i === currentSlide
-      );
-
+      dot.classList.toggle("active", i === currentSlide);
     });
-
   }
-
 
   function changeSlide(direction) {
-
     showSlide(currentSlide + direction);
-
   }
 
-
   function startAutoSlide() {
-
     clearInterval(autoSlide);
 
     autoSlide = setInterval(() => {
-
       changeSlide(1);
-
     }, 4000);
-
   }
 
-
-  previousButton.addEventListener("click", () => {
-
+  previousButton?.addEventListener("click", () => {
     changeSlide(-1);
     startAutoSlide();
-
   });
 
-
-  nextButton.addEventListener("click", () => {
-
+  nextButton?.addEventListener("click", () => {
     changeSlide(1);
     startAutoSlide();
-
   });
-
 
   dots.forEach((dot, index) => {
-
     dot.addEventListener("click", () => {
-
       showSlide(index);
       startAutoSlide();
-
     });
-
   });
 
-
-  // MOBILE SWIPE SUPPORT
-
+  // Mobile swipe support
   let touchStartX = 0;
 
   track.addEventListener("touchstart", event => {
-
     touchStartX = event.changedTouches[0].clientX;
-
   }, { passive: true });
 
-
   track.addEventListener("touchend", event => {
-
-    const touchEndX =
-      event.changedTouches[0].clientX;
-
+    const touchEndX = event.changedTouches[0].clientX;
     const difference = touchStartX - touchEndX;
 
     if (Math.abs(difference) > 45) {
-
       changeSlide(difference > 0 ? 1 : -1);
       startAutoSlide();
-
     }
-
   }, { passive: true });
 
-
+  showSlide(0);
   startAutoSlide();
-
 })();
-
-
-// ========================================
-// WEDDING SONG PLAYER
-// Add assets/dholna-ve.mp3
-// ========================================
-
-const audio = document.getElementById("weddingAudio");
-
-const musicButton =
-  document.getElementById("musicToggle");
-
-const musicLabel =
-  document.getElementById("musicLabel");
-
-
-musicButton.addEventListener("click", async () => {
-
-  if (audio.paused) {
-
-    try {
-
-      await audio.play();
-
-      musicButton.parentElement.classList.add("playing");
-
-      musicLabel.textContent = "NOW PLAYING";
-
-    } catch (error) {
-
-      musicLabel.textContent = "ADD SONG FILE";
-
-    }
-
-  } else {
-
-    audio.pause();
-
-    musicButton.parentElement.classList.remove("playing");
-
-    musicLabel.textContent = "PLAY OUR SONG";
-
-  }
-
-});
 
 
 // ========================================
 // RSVP THROUGH WHATSAPP
 // ========================================
 
-document.getElementById("rsvpForm").addEventListener("submit", event => {
+const rsvpForm = document.getElementById("rsvpForm");
 
+rsvpForm?.addEventListener("submit", event => {
   event.preventDefault();
 
-  const name =
-    document.getElementById("guestName").value.trim();
-
-  const count =
-    document.getElementById("guestCount").value;
-
-  const attendance =
-    document.getElementById("attendance").value;
+  const name = document.getElementById("guestName")?.value.trim();
+  const count = document.getElementById("guestCount")?.value;
+  const attendance = document.getElementById("attendance")?.value;
 
   const message =
     `Wedding RSVP for ${WEDDING.couple}\n` +
@@ -550,18 +457,19 @@ document.getElementById("rsvpForm").addEventListener("submit", event => {
 
   const number = WEDDING.whatsappNumber;
 
-  if (number === "919876543210") {
+  if (!number || number === "919876543210") {
+    const note = document.getElementById("rsvpNote");
 
-    document.getElementById("rsvpNote").textContent =
-      "Demo mode: update whatsappNumber in script.js to receive RSVPs.";
+    if (note) {
+      note.textContent =
+        "Demo mode: update whatsappNumber in script.js to receive RSVPs.";
+    }
 
     return;
-
   }
 
   const url =
     `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 
   window.open(url, "_blank", "noopener");
-
 });
