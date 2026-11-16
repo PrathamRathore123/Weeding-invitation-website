@@ -6,7 +6,7 @@
 const WEDDING = {
   date: "2027-02-14T19:00:00+05:30",
   whatsappNumber: "919876543210",
-  couple: "Aarav & Aanya"
+  couple: "Harsh & Kavita"
 };
 
 
