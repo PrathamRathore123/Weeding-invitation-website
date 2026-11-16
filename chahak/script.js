@@ -121,8 +121,7 @@ const musicPlayer = musicShell?.parentElement?.classList.contains("music-player"
   ? musicShell.parentElement
   : musicShell;
 
-// Flatten the old nested player markup so there is no decorative container
-// overlaying or shrinking the actual clickable play/pause button.
+// Flatten the old nested player markup so the extra wrapper cannot cover the button.
 if (musicButton && musicShell && musicPlayer && musicShell !== musicPlayer) {
   musicPlayer.insertBefore(musicButton, musicShell);
   musicShell.remove();
@@ -293,7 +292,10 @@ audio?.addEventListener("error", () => {
     if (invitationEntered) return;
     invitationEntered = true;
 
-    // Music stays off until the guest explicitly presses the play button.
+    // Start playback directly from the Enter button's user gesture.
+    // If playback is blocked or unavailable, the on-screen music control can retry.
+    playWeddingMusic();
+
     gate.classList.add("is-hidden");
     document.body.classList.remove("scratch-locked");
     if (musicPlayer) musicPlayer.style.display = "flex";
