@@ -16,18 +16,14 @@ const WEDDING = {
 function updateCountdown() {
   const target = new Date(WEDDING.date).getTime();
   const now = Date.now();
-
   let diff = Math.max(0, target - now);
 
   const days = Math.floor(diff / 86400000);
   diff %= 86400000;
-
   const hours = Math.floor(diff / 3600000);
   diff %= 3600000;
-
   const minutes = Math.floor(diff / 60000);
   diff %= 60000;
-
   const seconds = Math.floor(diff / 1000);
 
   const setText = (id, value) => {
@@ -68,9 +64,7 @@ menuToggle?.addEventListener("click", () => {
 });
 
 nav?.querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", () => {
-    nav.classList.remove("open");
-  });
+  link.addEventListener("click", () => nav.classList.remove("open"));
 });
 
 
@@ -104,14 +98,12 @@ const petalLayer = document.getElementById("petals");
 if (petalLayer) {
   for (let i = 0; i < 18; i++) {
     const petal = document.createElement("span");
-
     petal.className = "petal";
     petal.style.left = Math.random() * 100 + "%";
     petal.style.animationDuration = (10 + Math.random() * 13) + "s";
     petal.style.animationDelay = (-Math.random() * 20) + "s";
     petal.style.opacity = (0.18 + Math.random() * 0.35).toFixed(2);
     petal.style.transform = `scale(${0.55 + Math.random() * 0.8})`;
-
     petalLayer.appendChild(petal);
   }
 }
@@ -124,19 +116,49 @@ if (petalLayer) {
 const audio = document.getElementById("weddingAudio");
 const musicButton = document.getElementById("musicToggle");
 const musicLabel = document.getElementById("musicLabel");
-const musicPlayer = musicButton?.closest(".music-player");
+const musicShell = musicButton?.closest(".music-player");
+const musicPlayer = musicShell?.parentElement?.classList.contains("music-player")
+  ? musicShell.parentElement
+  : musicShell;
+
+// Flatten the old nested player markup so there is no decorative container
+// overlaying or shrinking the actual clickable play/pause button.
+if (musicButton && musicShell && musicPlayer && musicShell !== musicPlayer) {
+  musicPlayer.insertBefore(musicButton, musicShell);
+  musicShell.remove();
+}
+
+if (musicPlayer) {
+  musicPlayer.style.display = "none";
+  musicPlayer.style.background = "transparent";
+  musicPlayer.style.padding = "0";
+  musicPlayer.style.border = "0";
+  musicPlayer.style.boxShadow = "none";
+  musicPlayer.style.borderRadius = "0";
+}
+
+if (musicButton) {
+  musicButton.type = "button";
+  musicButton.style.width = "52px";
+  musicButton.style.height = "52px";
+  musicButton.style.padding = "0";
+  musicButton.style.border = "0";
+  musicButton.style.borderRadius = "50%";
+  musicButton.style.display = "grid";
+  musicButton.style.placeItems = "center";
+  musicButton.style.cursor = "pointer";
+  musicButton.style.position = "relative";
+  musicButton.style.zIndex = "10000";
+  musicButton.style.pointerEvents = "auto";
+}
 
 function updateMusicButton(playing) {
   if (!musicButton) return;
 
-  musicButton.parentElement?.classList.toggle("playing", playing);
   musicButton.textContent = playing ? "♫" : "♪";
   musicButton.setAttribute("aria-label", playing ? "Pause wedding song" : "Play wedding song");
   musicButton.setAttribute("aria-pressed", String(playing));
-
-  if (musicLabel) {
-    musicLabel.textContent = playing ? "NOW PLAYING · PAUSE" : "PLAY OUR SONG";
-  }
+  if (musicLabel) musicLabel.textContent = playing ? "NOW PLAYING" : "PLAY OUR SONG";
 }
 
 async function playWeddingMusic() {
@@ -163,10 +185,7 @@ function pauseWeddingMusic() {
 musicButton?.addEventListener("click", () => {
   if (!audio) {
     if (musicLabel) musicLabel.textContent = "SONG NOT FOUND";
-    return;
-  }
-
-  if (audio.paused) {
+  } else if (audio.paused) {
     playWeddingMusic();
   } else {
     pauseWeddingMusic();
@@ -178,12 +197,6 @@ audio?.addEventListener("pause", () => updateMusicButton(false));
 audio?.addEventListener("error", () => {
   if (musicLabel) musicLabel.textContent = "SONG UNAVAILABLE";
 });
-
-// Repair visibility of the existing player wrapper. It was hidden inline in the
-// original markup; it becomes available only after the invitation is opened.
-if (musicPlayer) {
-  musicPlayer.style.display = "none";
-}
 
 
 // ========================================
@@ -208,15 +221,8 @@ if (musicPlayer) {
   let lastCheck = 0;
   let invitationEntered = false;
 
-  enterButton.disabled = true;
-
-  // Allow guests to skip the scratch interaction entirely.
-  const skipButton = document.createElement("button");
-  skipButton.id = "skipScratch";
-  skipButton.type = "button";
-  skipButton.textContent = "Skip scratch & open invitation";
-  skipButton.style.cssText = "display:block;margin:12px auto 0;padding:10px 16px;border:1px solid #c89b45;border-radius:4px;background:transparent;color:#742723;font:inherit;font-size:14px;cursor:pointer;";
-  enterButton.insertAdjacentElement("afterend", skipButton);
+  // Scratching is optional. The same Enter button always opens the invitation.
+  enterButton.disabled = false;
 
   function paintCover() {
     const rect = canvas.getBoundingClientRect();
@@ -235,7 +241,6 @@ if (musicPlayer) {
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, rect.width, rect.height);
-
     ctx.fillStyle = "rgba(255,255,255,.4)";
     ctx.textAlign = "center";
     ctx.font = "600 15px sans-serif";
@@ -260,12 +265,10 @@ if (musicPlayer) {
     }
 
     const percentage = total ? Math.round((clear / total) * 100) : 0;
-
     if (percentage >= 45) {
       revealed = true;
       canvas.style.transition = "opacity .5s";
       canvas.style.opacity = "0";
-      enterButton.disabled = false;
       if (progress) progress.textContent = "The surprise is revealed! 💛";
     } else if (progress) {
       progress.textContent = "Keep scratching to reveal the surprise ✨";
@@ -274,7 +277,6 @@ if (musicPlayer) {
 
   function scratch(event) {
     if (!drawing || revealed) return;
-
     const point = getPoint(event);
     ctx.globalCompositeOperation = "destination-out";
     ctx.beginPath();
@@ -291,15 +293,10 @@ if (musicPlayer) {
     if (invitationEntered) return;
     invitationEntered = true;
 
-    // Do not autoplay: guests can start and stop the song with the player button.
+    // Music stays off until the guest explicitly presses the play button.
     gate.classList.add("is-hidden");
     document.body.classList.remove("scratch-locked");
-
-    if (musicPlayer) {
-      musicPlayer.style.removeProperty("display");
-      musicPlayer.style.display = "flex";
-    }
-
+    if (musicPlayer) musicPlayer.style.display = "flex";
     setTimeout(() => gate.remove(), 700);
   }
 
@@ -309,17 +306,13 @@ if (musicPlayer) {
     canvas.setPointerCapture(event.pointerId);
     scratch(event);
   });
-
   canvas.addEventListener("pointermove", scratch);
 
   ["pointerup", "pointercancel", "lostpointercapture"].forEach(type => {
     canvas.addEventListener(type, () => { drawing = false; });
   });
 
-  enterButton.addEventListener("click", () => {
-    if (revealed) openInvitation();
-  });
-  skipButton.addEventListener("click", openInvitation);
+  enterButton.addEventListener("click", openInvitation);
 
   paintCover();
   window.addEventListener("resize", () => {
@@ -366,12 +359,10 @@ if (musicPlayer) {
     changeSlide(-1);
     startAutoSlide();
   });
-
   nextButton?.addEventListener("click", () => {
     changeSlide(1);
     startAutoSlide();
   });
-
   dots.forEach((dot, index) => {
     dot.addEventListener("click", () => {
       showSlide(index);
@@ -383,7 +374,6 @@ if (musicPlayer) {
   track.addEventListener("touchstart", event => {
     touchStartX = event.changedTouches[0].clientX;
   }, { passive: true });
-
   track.addEventListener("touchend", event => {
     const difference = touchStartX - event.changedTouches[0].clientX;
     if (Math.abs(difference) > 45) {
@@ -405,7 +395,6 @@ const rsvpForm = document.getElementById("rsvpForm");
 
 rsvpForm?.addEventListener("submit", event => {
   event.preventDefault();
-
   const name = document.getElementById("guestName")?.value.trim();
   const count = document.getElementById("guestCount")?.value;
   const attendance = document.getElementById("attendance")?.value;
@@ -415,14 +404,11 @@ rsvpForm?.addEventListener("submit", event => {
     `Name: ${name}\n` +
     `Guests: ${count}\n` +
     `Response: ${attendance}`;
-
   const number = WEDDING.whatsappNumber;
 
   if (!number || number === "919876543210") {
     const note = document.getElementById("rsvpNote");
-    if (note) {
-      note.textContent = "Demo mode: update whatsappNumber in script.js to receive RSVPs.";
-    }
+    if (note) note.textContent = "Demo mode: update whatsappNumber in script.js to receive RSVPs.";
     return;
   }
 
