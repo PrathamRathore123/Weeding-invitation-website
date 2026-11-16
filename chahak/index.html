@@ -1,0 +1,685 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff9ed">
+  <meta name="description" content="A celebration of love. Join us for the wedding festivities.">
+  <title>Aarav & Aanya — The Wedding</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- SCRATCH CARD OPENING -->
+  <div class="scratch-gate" id="scratchGate">
+    <div class="scratch-card">
+      <p class="eyebrow">A LITTLE SURPRISE AWAITS</p>
+      <h2>Scratch to Reveal</h2>
+      <p class="scratch-hint">Reveal the date and dress code of our big day</p>
+
+      <div class="scratch-reveal">
+        <div class="reveal-copy">
+          <span class="reveal-label">THE WEDDING DAY</span>
+          <strong>14 February 2027</strong>
+          <span>7:00 PM onwards</span>
+
+          <span class="reveal-label dress-label">DRESS CODE</span>
+          <strong class="dress-code">Traditional Elegance</strong>
+          <span>Indian ethnic wear · Festive colours</span>
+        </div>
+
+        <canvas id="scratchCanvas"></canvas>
+      </div>
+
+      <button id="enterInvite" disabled>
+        ENTER THE INVITATION
+      </button>
+
+      <p class="scratch-progress" id="scratchProgress">
+        Scratch the golden layer to uncover the surprise ✨
+      </p>
+    </div>
+  </div>
+
+
+  <!-- LOADING ANIMATION -->
+  <div class="loader" id="loader">
+    <div class="loader-flower">✿</div>
+    <p>A celebration of love</p>
+    <span>PLEASE WAIT A MOMENT</span>
+  </div>
+
+  <div class="petal-layer" id="petals"></div>
+
+  <div class="side-flower side-flower-left">❀</div>
+  <div class="side-flower side-flower-right">❀</div>
+
+
+  <!-- NAVIGATION -->
+  <header class="topbar">
+
+    <a class="brand" href="#home">
+      <span class="brand-mark">A<span>♥</span>A</span>
+      <span class="brand-caption">THE WEDDING</span>
+    </a>
+
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
+    <nav id="nav">
+      <a href="#story">Our Story</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#events">Celebrations</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#venue">Venue</a>
+      <a class="nav-rsvp" href="#rsvp">RSVP ↗</a>
+    </nav>
+
+  </header>
+
+
+  <main>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+
+      <div class="hero-glow"></div>
+
+      <div class="hero-copy reveal">
+
+        <p class="eyebrow">
+          <span></span>
+          WITH THE BLESSINGS OF OUR FAMILIES
+          <span></span>
+        </p>
+
+        <p class="script-intro">Together with love,</p>
+
+        <h1>
+          <span>Aarav</span>
+          <i>&</i>
+          <span>Aanya</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          INVITE YOU TO CELEBRATE THE BEGINNING OF FOREVER
+        </p>
+
+        <div class="hero-divider"><b>✦</b></div>
+
+        <p class="hero-date">
+          14 <span>·</span> FEBRUARY <span>·</span> 2027
+        </p>
+
+        <p class="hero-place">
+          THE ROYAL PALACE GARDEN · INDORE
+        </p>
+
+        <a class="gold-button" href="#events">
+          EXPLORE THE CELEBRATION ↓
+        </a>
+
+      </div>
+
+
+      <!-- MANDAP ILLUSTRATION -->
+      <div class="mandap-scene">
+
+        <div class="sun-halo"></div>
+
+        <div class="arch arch-outer"></div>
+        <div class="arch arch-inner"></div>
+
+        <div class="arch-garland garland-one"></div>
+        <div class="arch-garland garland-two"></div>
+
+        <div class="hanging hang-left">✿<i>❀</i>✿</div>
+        <div class="hanging hang-right">✿<i>❀</i>✿</div>
+
+        <div class="mandap-roof">
+          <span>✧</span>
+          <span>✿</span>
+          <span>✧</span>
+        </div>
+
+        <div class="mandap-pillars">
+          <b></b><b></b><b></b><b></b>
+        </div>
+
+        <div class="mandap-stage"></div>
+        <div class="mandap-rug"></div>
+
+        <div class="couple-silhouette">
+          <span class="person bride"></span>
+          <span class="person groom"></span>
+        </div>
+
+        <div class="diya diya-left">♨<span></span></div>
+        <div class="diya diya-right">♨<span></span></div>
+
+        <div class="scene-caption">
+          A little tradition · A lifetime of togetherness
+        </div>
+
+      </div>
+
+      <div class="scroll-cue">
+        <span></span> SCROLL TO FEEL THE LOVE
+      </div>
+
+    </section>
+
+
+    <!-- BRIDE AND GROOM PHOTO SLIDER -->
+    <section class="couple-gallery" id="gallery">
+
+      <div class="gallery-heading">
+        <span>♥ OUR BEAUTIFUL JOURNEY ♥</span>
+        <h2>Two Hearts, One Story</h2>
+        <p>A glimpse of our forever</p>
+      </div>
+
+      <div class="slider-container">
+
+        <button class="slider-btn" id="prevSlide" aria-label="Previous photo">
+          ❮
+        </button>
+
+        <div class="slider">
+
+          <div class="slides" id="slides">
+
+            <div class="slide">
+              <img src="assets/couple-1.jpg" alt="Bride and groom photograph 1">
+              <div class="photo-caption">
+                Together is a beautiful place to be ♥
+              </div>
+            </div>
+
+            <div class="slide">
+              <img src="assets/couple-2.jpg" alt="Bride and groom photograph 2">
+              <div class="photo-caption">
+                Our story, our forever ✨
+              </div>
+            </div>
+
+            <div class="slide">
+              <img src="assets/couple-3.jpg" alt="Bride and groom photograph 3">
+              <div class="photo-caption">
+                A lifetime of love begins here
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <button class="slider-btn" id="nextSlide" aria-label="Next photo">
+          ❯
+        </button>
+
+      </div>
+
+      <div class="slider-dots" id="sliderDots">
+        <button class="dot active" aria-label="Photo 1"></button>
+        <button class="dot" aria-label="Photo 2"></button>
+        <button class="dot" aria-label="Photo 3"></button>
+      </div>
+
+    </section>
+
+
+    <!-- OUR STORY -->
+    <section class="intro section-pad" id="story">
+
+      <div class="section-kicker">॥ शुभ विवाह ॥</div>
+
+      <p class="script-heading">
+        Two hearts, one beautiful journey
+      </p>
+
+      <h2>THE BEGINNING OF <em>FOREVER</em></h2>
+
+      <div class="ornament">✦ <span>❀</span> ✦</div>
+
+      <p class="intro-text">
+        With the love and blessings of our families, we invite you
+        to be a part of our most cherished celebration.
+        Your presence will make our special moments even more memorable.
+      </p>
+
+      <div class="couple-names">
+        <span>Aarav Sharma</span>
+        <b>♥</b>
+        <span>Aanya Verma</span>
+      </div>
+
+      <p class="small-note">
+        Together with our families, we request the pleasure of your company.
+      </p>
+
+    </section>
+
+
+    <!-- COUNTDOWN -->
+    <section class="countdown-section section-pad">
+
+      <div class="countdown-card">
+
+        <p class="eyebrow">THE COUNTDOWN BEGINS</p>
+
+        <h2>Until we say <em>“I do”</em></h2>
+
+        <div class="countdown">
+
+          <div>
+            <strong id="days">000</strong>
+            <span>DAYS</span>
+          </div>
+
+          <i>:</i>
+
+          <div>
+            <strong id="hours">00</strong>
+            <span>HOURS</span>
+          </div>
+
+          <i>:</i>
+
+          <div>
+            <strong id="minutes">00</strong>
+            <span>MINUTES</span>
+          </div>
+
+          <i>:</i>
+
+          <div>
+            <strong id="seconds">00</strong>
+            <span>SECONDS</span>
+          </div>
+
+        </div>
+
+        <p class="countdown-foot">
+          14 February 2027 · Indore, India
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- WEDDING EVENTS -->
+    <section class="events section-pad" id="events">
+
+      <div class="section-kicker">THE WEDDING FESTIVITIES</div>
+
+      <p class="script-heading">A celebration in every colour</p>
+
+      <h2>OUR <em>CELEBRATIONS</em></h2>
+
+      <div class="event-grid">
+
+        <article class="event-card event-mehendi">
+
+          <div class="event-image">
+            <span class="event-number">01</span>
+            <span class="event-icon">❋</span>
+            <div class="event-image-title">MEHENDI</div>
+          </div>
+
+          <div class="event-details">
+            <p class="event-date">12 FEBRUARY 2027 · FRIDAY</p>
+            <h3>Mehendi & Mingle</h3>
+
+            <p>
+              An afternoon of intricate henna, marigold hues,
+              laughter and music with our favourite people.
+            </p>
+
+            <div class="event-meta">
+              <span>◷ 4:00 PM onwards</span>
+              <span>⌖ The Royal Palace Garden</span>
+            </div>
+
+            <span class="dress-code">
+              DRESS CODE · GREEN & YELLOW
+            </span>
+          </div>
+
+        </article>
+
+
+        <article class="event-card event-haldi">
+
+          <div class="event-image">
+            <span class="event-number">02</span>
+            <span class="event-icon">☼</span>
+            <div class="event-image-title">HALDI</div>
+          </div>
+
+          <div class="event-details">
+            <p class="event-date">13 FEBRUARY 2027 · SATURDAY</p>
+            <h3>Haldi & Happiness</h3>
+
+            <p>
+              Sunshine, turmeric, blessings and a whole lot of
+              happy chaos. Let the festivities glow!
+            </p>
+
+            <div class="event-meta">
+              <span>◷ 10:00 AM onwards</span>
+              <span>⌖ The Royal Palace Garden</span>
+            </div>
+
+            <span class="dress-code">
+              DRESS CODE · YELLOW & WHITE
+            </span>
+          </div>
+
+        </article>
+
+
+        <article class="event-card event-sangeet">
+
+          <div class="event-image">
+            <span class="event-number">03</span>
+            <span class="event-icon">♫</span>
+            <div class="event-image-title">SANGEET</div>
+          </div>
+
+          <div class="event-details">
+            <p class="event-date">13 FEBRUARY 2027 · SATURDAY</p>
+            <h3>Dance the Night Away</h3>
+
+            <p>
+              Our favourite people, unforgettable performances
+              and a dance floor full of memories.
+            </p>
+
+            <div class="event-meta">
+              <span>◷ 7:00 PM onwards</span>
+              <span>⌖ The Royal Palace Garden</span>
+            </div>
+
+            <span class="dress-code">
+              DRESS CODE · FESTIVE INDIAN
+            </span>
+          </div>
+
+        </article>
+
+
+        <article class="event-card event-wedding">
+
+          <div class="event-image">
+            <span class="event-number">04</span>
+            <span class="event-icon">♡</span>
+            <div class="event-image-title">WEDDING</div>
+          </div>
+
+          <div class="event-details">
+            <p class="event-date">14 FEBRUARY 2027 · SUNDAY</p>
+            <h3>The Wedding Ceremony</h3>
+
+            <p>
+              As we take our seven sacred vows, we would be
+              honoured to have you beside us.
+            </p>
+
+            <div class="event-meta">
+              <span>◷ 7:00 PM · Varmala 8:00 PM</span>
+              <span>⌖ The Royal Palace Garden</span>
+            </div>
+
+            <span class="dress-code">
+              DRESS CODE · TRADITIONAL ELEGANCE
+            </span>
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- WEDDING DAY SCHEDULE -->
+    <section class="schedule section-pad" id="schedule">
+
+      <div class="section-kicker">SAVE YOUR MOMENTS</div>
+
+      <p class="script-heading">The day, beautifully planned</p>
+
+      <h2>WEDDING DAY <em>SCHEDULE</em></h2>
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <time>06:30 PM</time>
+          <span class="timeline-dot">✦</span>
+          <div>
+            <h3>Guest Welcome</h3>
+            <p>Arrive, settle in and enjoy a warm welcome.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <time>07:00 PM</time>
+          <span class="timeline-dot">✦</span>
+          <div>
+            <h3>Baraat & Celebration</h3>
+            <p>Join the music, dancing and grand arrival.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <time>08:00 PM</time>
+          <span class="timeline-dot">✦</span>
+          <div>
+            <h3>Varmala Ceremony</h3>
+            <p>A beautiful moment as two families become one.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <time>09:00 PM</time>
+          <span class="timeline-dot">✦</span>
+          <div>
+            <h3>Pheras & Blessings</h3>
+            <p>Seven vows, a lifetime of promises.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <time>10:00 PM</time>
+          <span class="timeline-dot">✦</span>
+          <div>
+            <h3>Dinner & Celebration</h3>
+            <p>Dinner, photographs and memories together.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="schedule-note">
+        * Timings are sample details and can be edited.
+      </p>
+
+    </section>
+
+
+    <!-- VENUE -->
+    <section class="venue section-pad" id="venue">
+
+      <div class="venue-copy">
+
+        <div class="section-kicker">WE CAN'T WAIT TO SEE YOU</div>
+
+        <p class="script-heading">
+          Find your way to our forever
+        </p>
+
+        <h2>THE <em>VENUE</em></h2>
+
+        <h3>The Royal Palace Garden</h3>
+
+        <p>
+          AB Road, near Brilliant Convention Centre,<br>
+          Indore, Madhya Pradesh 452010
+        </p>
+
+        <div class="venue-facts">
+          <span>✦ 14 February 2027</span>
+          <span>✦ 7:00 PM onwards</span>
+        </div>
+
+        <a class="red-button"
+           href="https://www.google.com/maps/search/?api=1&query=Brilliant+Convention+Centre+Indore"
+           target="_blank"
+           rel="noopener">
+          GET DIRECTIONS ↗
+        </a>
+
+      </div>
+
+      <div class="map-frame">
+
+        <iframe
+          title="Map to wedding venue"
+          src="https://www.google.com/maps?q=Brilliant%20Convention%20Centre%2C%20Indore&output=embed"
+          loading="lazy">
+        </iframe>
+
+        <div class="map-label">
+          <span>⌖</span>
+          <div>
+            <b>The Royal Palace Garden</b>
+            <small>Indore, Madhya Pradesh</small>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- RSVP -->
+    <section class="rsvp section-pad" id="rsvp">
+
+      <div class="rsvp-inner">
+
+        <div class="section-kicker">
+          YOUR PRESENCE IS OUR PRESENT
+        </div>
+
+        <p class="script-heading">Will you join us?</p>
+
+        <h2>LET US CELEBRATE <em>TOGETHER</em></h2>
+
+        <p>
+          We would love to know if you can make it.
+          Kindly let us know by 01 February 2027.
+        </p>
+
+        <form id="rsvpForm">
+
+          <input
+            id="guestName"
+            type="text"
+            placeholder="Your full name"
+            required>
+
+          <input
+            id="guestCount"
+            type="number"
+            min="1"
+            max="20"
+            placeholder="Number of guests"
+            required>
+
+          <select id="attendance" required>
+            <option value="">Will you be joining us?</option>
+            <option>Joyfully accepts</option>
+            <option>Regretfully declines</option>
+          </select>
+
+          <button class="gold-button" type="submit">
+            SEND RSVP ↗
+          </button>
+
+        </form>
+
+        <p class="rsvp-note" id="rsvpNote">
+          Update your WhatsApp number in script.js to receive RSVPs.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- CLOSING -->
+    <section class="closing section-pad">
+
+      <div class="closing-flower">❀</div>
+
+      <p class="script-heading">A little note from us</p>
+
+      <h2>
+        MADE OF LOVE,<br>
+        <em>SEALED WITH BLESSINGS.</em>
+      </h2>
+
+      <p>We look forward to celebrating with you.</p>
+
+      <div class="closing-monogram">
+        A <span>♥</span> A
+      </div>
+
+      <p class="closing-names">AARAV & AANYA</p>
+
+      <p class="closing-date">14 · 02 · 2027</p>
+
+    </section>
+
+  </main>
+
+
+  <!-- FOOTER -->
+  <footer>
+    <span>MADE WITH ♡ FOR AARAV & AANYA</span>
+    <a href="#home">BACK TO TOP ↑</a>
+  </footer>
+
+
+  <!-- MUSIC PLAYER -->
+  <div class="music-player">
+
+    <button id="musicToggle">
+      <span class="music-bars">
+        <i></i><i></i><i></i><i></i>
+      </span>
+      <span id="musicLabel">PLAY OUR SONG</span>
+    </button>
+
+    <audio id="weddingAudio" loop preload="none">
+      <source src="assets/dholna-ve.mp3" type="audio/mpeg">
+    </audio>
+
+  </div>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
